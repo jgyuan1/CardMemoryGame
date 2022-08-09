@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 struct MemoryGame<CardContent> where CardContent: Equatable{
     
@@ -13,16 +14,11 @@ struct MemoryGame<CardContent> where CardContent: Equatable{
     // In order to keep in sync with info in cards
     // use computed value
     private var indexOfTheOnlyFaceUpCard: Int? {
-        var indexesOfFaceUpCard: [Int] = []
-        for cardIndex in cards.indices {
-            if(cards[cardIndex].isFaceUp){
-                indexesOfFaceUpCard.append(cardIndex)
-            }
+        get {
+            cards.indices.filter({cards[$0].isFaceUp}).oneAndTheOnlyOne
         }
-        if indexesOfFaceUpCard.count == 1 {
-            return indexesOfFaceUpCard.first
-        } else {
-            return nil
+        set {
+            cards.indices.forEach({cards[$0].isFaceUp = false})
         }
     }
     
@@ -35,7 +31,7 @@ struct MemoryGame<CardContent> where CardContent: Equatable{
         }
     }
     
-    mutating func chooseCard(card: Card) {
+    mutating func chooseCard(_ card: Card) {
         if let chosenIndex = cards.firstIndex(where: {$0.id == card.id}), !cards[chosenIndex].isFaceUp, !cards[chosenIndex].isMatched{
             if let potentialMatchedIndex = indexOfTheOnlyFaceUpCard {
                 if cards[chosenIndex].content == cards[potentialMatchedIndex].content {
@@ -43,9 +39,10 @@ struct MemoryGame<CardContent> where CardContent: Equatable{
                     cards[potentialMatchedIndex].isMatched = true
                 }
             } else {
-                for index in cards.indices {
-                    cards[index].isFaceUp = false
-                }
+//                for index in cards.indices {
+//                    cards[index].isFaceUp = false
+//                }
+                indexOfTheOnlyFaceUpCard = chosenIndex
             }
             cards[chosenIndex].isFaceUp = true
         }
@@ -56,5 +53,15 @@ struct MemoryGame<CardContent> where CardContent: Equatable{
         var isMatched = false
         let content:CardContent
         let id:Int
+    }
+}
+
+extension Array {
+    var oneAndTheOnlyOne:Element? {
+        if count == 1 {
+            return first
+        } else {
+            return nil
+        }
     }
 }

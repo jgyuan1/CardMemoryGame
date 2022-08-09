@@ -17,18 +17,22 @@ struct EmojiMemoryGameView: View {
 //    var cards:Array<MemoryGame<String>.Card> { return viewModel.cards}
    
     var body: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum:65))]) {
-            ForEach(game.cards, content: {card in
-                CardView(card)
-                    .aspectRatio(2/3, contentMode: .fit)
-                //onTapGesture uses viewModel, which cannot be used in CardView
-                //Users/chenglonghao/Development/swiftLearn/MemorizeCards/MemorizeCards/ContentView.swift:48:13: Instance member 'viewModel' of type 'ContentView' cannot be used on instance of nested type 'ContentView.CardView'
-                    .onTapGesture {
-                        game.chooseCard(card: card)
-                    }
-            })
-        }.foregroundColor(.red).padding(.horizontal)
+        ScrollView{
+            LazyVGrid(columns: [GridItem(.adaptive(minimum:100))]) {
+                ForEach(game.cards, content: {card in
+                    CardView(card)
+                        .aspectRatio(2/3, contentMode: .fit)
+                    //onTapGesture uses viewModel, which cannot be used in CardView
+                    //Users/chenglonghao/Development/swiftLearn/MemorizeCards/MemorizeCards/ContentView.swift:48:13: Instance member 'viewModel' of type 'ContentView' cannot be used on instance of nested type 'ContentView.CardView'
+                        .onTapGesture {
+                            game.chooseCard(card)
+                        }
+                })
+            }
+        }
+        .foregroundColor(.red).padding(.horizontal)
     }
+}
 //nested type ContentView.CardView?????????????check docs
 
 struct CardView: View {
@@ -40,26 +44,38 @@ struct CardView: View {
     }
                 
     var body: some View {
-        ZStack {
-            let shape = RoundedRectangle(cornerRadius: 25)
-            if card.isFaceUp {
-                //this line will return some view
-                shape.fill().foregroundColor(.white)
-                // need to call strokeBorder on shape
-                shape.strokeBorder(lineWidth: 3)
-                Text(card.content)
-                    .font(.largeTitle)
-            } else if card.isMatched {
-                shape.opacity(0)
-            } else {
-                shape.fill()
+        GeometryReader {
+            geometry in
+            ZStack {
+                let shape = RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
+                if card.isFaceUp {
+                    //this line will return some view
+                    shape.fill().foregroundColor(.white)
+                    // need to call strokeBorder on shape
+                    shape.strokeBorder(lineWidth: DrawingConstants.lineWidth)
+                    Text(card.content)
+                        .font(font(in: geometry.size))
+                } else if card.isMatched {
+                    shape.opacity(0)
+                } else {
+                    shape.fill()
+                }
             }
         }
         
     }
+    
+    private func font(in size: CGSize) -> Font{
+        Font.system(size: min(size.width, size.height) * DrawingConstants.fontScale)
+    }
+    private struct DrawingConstants {
+        static let cornerRadius: CGFloat = 20
+        static let lineWidth: CGFloat = 3
+        static let fontScale: CGFloat = 0.8
+    }
 }
 
-}
+
 
 
 
