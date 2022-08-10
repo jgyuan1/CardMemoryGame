@@ -28,7 +28,7 @@ struct AspectVGrid<Item, ItemView>: View where ItemView: View, Item: Identifiabl
     // so @escaping tells the compiler to let this closure live in the heap and escape the init() scope.
     
     //!!! if (Item) -> ItemView) contains if-elses or some view list, we should mark content as a ViewBuilder
-    // @ViewBuilder will let the compiler use some mechanism to compile the things in {} as a view
+    // @ViewBuilder will let the compiler use some mechanism to compile the things in {} as a viewt
     
 //    init(items:[Item], aspectRatio:CGFloat, @ViewBuilder content: @escaping (Item) -> ItemView) {
 //        self.items = items

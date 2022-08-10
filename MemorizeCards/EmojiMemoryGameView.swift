@@ -50,23 +50,32 @@ struct CardView: View {
     }
                 
     var body: some View {
-        GeometryReader {
-            geometry in
+        GeometryReader { geometry in
             ZStack {
-                let shape = RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
-                if card.isFaceUp {
-                    //this line will return some view
-                    shape.fill().foregroundColor(.white)
-                    // need to call strokeBorder on shape
-                    shape.strokeBorder(lineWidth: DrawingConstants.lineWidth)
-                    Text(card.content)
-                        .font(font(in: geometry.size))
-                } else if card.isMatched {
-                    shape.opacity(0)
-                } else {
-                    shape.fill()
-                }
+                Pie(startAngle: Angle(degrees: 0-90), endAngle: Angle(degrees: 110-90 ))
+                                        .padding(5).opacity(0.5)
+                Text(card.content).font(font(in: geometry.size))
             }
+            .cardify(isFaceUp: card.isFaceUp, isHide: card.isMatched)
+            .animation(Animation.easeInOut,value: card.isMatched)
+            
+//            ZStack {
+//                let shape = RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
+//                if card.isFaceUp {
+//                    //this line will return some view
+//                    shape.fill().foregroundColor(.white)
+//                    // need to call strokeBorder on shape
+//                    shape.strokeBorder(lineWidth: DrawingConstants.lineWidth)
+//                    Pie(startAngle: Angle(degrees: 0-90), endAngle: Angle(degrees: 110-90 ))
+//                        .padding(5).opacity(0.5)
+//                    Text(card.content)
+//                        .font(font(in: geometry.size))
+//                } else if card.isMatched {
+//                    shape.opacity(0)
+//                } else {
+//                    shape.fill()
+//                }
+//            }
         }
         
     }
