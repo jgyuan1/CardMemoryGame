@@ -10,7 +10,7 @@ import Foundation
 class EmojiMemoryGame: ObservableObject{
     typealias Card = MemoryGame<String>.Card
     private static let emojis = ["🚚","🦼","🛺","🚘","🚕","🚙","🚌","🚎","🚐","🚒","🚑","🚓","🏎","🛻","🚉","🚜","🚔","🚖","🚈","🚅","🚞","🚍","🚲","🛵"]
-    @Published private var model = MemoryGame<String> (numberOfPairsOfCards: 10) {index in emojis[index]}
+    @Published private var model = MemoryGame<String> (numberOfPairsOfCards: 5) {index in emojis[index]}
     // Wrong！ cards = model.cards
     // This is an initializer of class property, which uses an instance property "model" before 'self' is ready.
     // the steps of class initialization

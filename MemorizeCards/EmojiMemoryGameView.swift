@@ -14,22 +14,28 @@ struct EmojiMemoryGameView: View {
     
     @ObservedObject var game: EmojiMemoryGame
     // computed property will not be initialized before "self"
-//    var cards:Array<MemoryGame<String>.Card> { return viewModel.cards}
+    // var cards:Array<MemoryGame<String>.Card> { return viewModel.cards}
    
     var body: some View {
-        ScrollView{
-            LazyVGrid(columns: [GridItem(.adaptive(minimum:100))]) {
-                ForEach(game.cards, content: {card in
-                    CardView(card)
-                        .aspectRatio(2/3, contentMode: .fit)
-                    //onTapGesture uses viewModel, which cannot be used in CardView
-                    //Users/chenglonghao/Development/swiftLearn/MemorizeCards/MemorizeCards/ContentView.swift:48:13: Instance member 'viewModel' of type 'ContentView' cannot be used on instance of nested type 'ContentView.CardView'
-                        .onTapGesture {
-                            game.chooseCard(card)
-                        }
-                })
+        AspectVGrid(items: game.cards, aspectRatio:2/3, content: { card in
+            CardView(card).onTapGesture {
+                game.chooseCard(card)
             }
-        }
+        })
+        
+//        ScrollView{
+//            LazyVGrid(columns: [GridItem(.adaptive(minimum:100))]) {
+//                ForEach(game.cards, content: {card in
+//                    CardView(card)
+//                        .aspectRatio(2/3, contentMode: .fit)
+//                    //onTapGesture uses viewModel, which cannot be used in CardView
+//                    //Users/chenglonghao/Development/swiftLearn/MemorizeCards/MemorizeCards/ContentView.swift:48:13: Instance member 'viewModel' of type 'ContentView' cannot be used on instance of nested type 'ContentView.CardView'
+//                        .onTapGesture {
+//                            game.chooseCard(card)
+//                        }
+//                })
+//            }
+//        }
         .foregroundColor(.red).padding(.horizontal)
     }
 }
