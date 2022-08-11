@@ -25,11 +25,14 @@ extension View {
 //}
 //}
 struct Cardify: AnimatableModifier {
+    // AnimatableModifier is an Animatable and a ViewModifier at the same time
     var isFaceUp: Bool
     var isMatched: Bool
     
     var rotation: Double// in degrees
     
+    
+    // Double/ CGFloat/ ...Pair can be animatableData
     var animatableData: Double {
         get { rotation }
         set { rotation = newValue }
@@ -55,9 +58,8 @@ struct Cardify: AnimatableModifier {
                 RoundedRectangle(cornerRadius: 10)
             }
             content.opacity(rotation < 90 ? 1 : 0)
-                .rotationEffect(Angle.degrees(isMatched ? 360 : 0))
+                
         }
-        .opacity(isMatched ? 0 : 1)
         .rotation3DEffect(.degrees(rotation), axis: (x: 0.0, y: 1.0, z: 0.0))
         // want isFaceUp from false to true
        

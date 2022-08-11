@@ -42,10 +42,17 @@ struct EmojiMemoryGameView: View {
     }
     var gameBody: some View {
         AspectVGrid(items: game.cards, aspectRatio:2/3, content: { card in
-            CardView(card).onTapGesture {
-                withAnimation {
-                    game.chooseCard(card)
-                }
+            //Color.clear can
+            if card.isMatched && !card.isFaceUp {
+                Color.clear
+            } else {
+                CardView(card)
+                    .transition(AnyTransition.scale.animation(Animation.easeInOut(duration: 2)))
+                    .onTapGesture {
+                        withAnimation {
+                            game.chooseCard(card)
+                        }
+                    }
             }
         })
             .foregroundColor(.red)
@@ -77,12 +84,14 @@ struct CardView: View {
                 Text(card.content)
 //                    .modifier(RotationAnimationModifier(isMatched: card.isMatched))
 //                    .font(font(in: geometry.size))
+                    .rotationEffect(Angle.degrees(card.isMatched ? 360 : 0))
+                    .animation(.linear(duration: 1).repeatForever(autoreverses: false), value: card.isMatched)
                     .font(Font.system(size: DrawingConstants.fontSize))
                     .scaleEffect(scale(thatFits: geometry.size))
             }
             .cardify(isFaceUp: card.isFaceUp, isMatched: card.isMatched)
-            .animation(.easeInOut(duration: 1), value: card.isMatched)
-            .animation(.easeInOut(duration: 1), value: card.isFaceUp)
+//            .animation(.easeInOut(duration: 1), value: card.isMatched)
+            
             
 //            .animation(Animation.easeInOut(duration: 5),value: card.isMatched)
             
