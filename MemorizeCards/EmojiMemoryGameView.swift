@@ -17,11 +17,13 @@ struct EmojiMemoryGameView: View {
     // var cards:Array<MemoryGame<String>.Card> { return viewModel.cards}
    
     var body: some View {
-        AspectVGrid(items: game.cards, aspectRatio:2/3, content: { card in
-            CardView(card).onTapGesture {
-                game.chooseCard(card)
-            }
-        })
+        VStack {
+            gameBody
+            shuffle
+            
+        }
+
+            .padding(.horizontal)
         
 //        ScrollView{
 //            LazyVGrid(columns: [GridItem(.adaptive(minimum:100))]) {
@@ -36,10 +38,28 @@ struct EmojiMemoryGameView: View {
 //                })
 //            }
 //        }
-        .foregroundColor(.red).padding(.horizontal)
+        
+    }
+    var gameBody: some View {
+        AspectVGrid(items: game.cards, aspectRatio:2/3, content: { card in
+            CardView(card).onTapGesture {
+                withAnimation {
+                    game.chooseCard(card)
+                }
+            }
+        })
+            .foregroundColor(.red)
+    }
+    var shuffle: some View {
+        Button("shuffle") {
+            withAnimation {
+                game.shuffle()
+            }
+        }
     }
 }
-//nested type ContentView.CardView?????????????check docs
+
+
 
 struct CardView: View {
     var card: EmojiMemoryGame.Card
@@ -54,10 +74,17 @@ struct CardView: View {
             ZStack {
                 Pie(startAngle: Angle(degrees: 0-90), endAngle: Angle(degrees: 110-90 ))
                                         .padding(5).opacity(0.5)
-                Text(card.content).font(font(in: geometry.size))
+                Text(card.content)
+//                    .modifier(RotationAnimationModifier(isMatched: card.isMatched))
+//                    .font(font(in: geometry.size))
+                    .font(Font.system(size: DrawingConstants.fontSize))
+                    .scaleEffect(scale(thatFits: geometry.size))
             }
-            .cardify(isFaceUp: card.isFaceUp, isHide: card.isMatched)
-            .animation(Animation.easeInOut,value: card.isMatched)
+            .cardify(isFaceUp: card.isFaceUp, isMatched: card.isMatched)
+            .animation(.easeInOut(duration: 1), value: card.isMatched)
+            .animation(.easeInOut(duration: 1), value: card.isFaceUp)
+            
+//            .animation(Animation.easeInOut(duration: 5),value: card.isMatched)
             
 //            ZStack {
 //                let shape = RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
@@ -77,16 +104,18 @@ struct CardView: View {
 //                }
 //            }
         }
-        
+    }
+    
+    private func scale(thatFits size: CGSize) -> CGFloat {
+        min(size.width, size.height) * DrawingConstants.fontScale/DrawingConstants.fontSize
     }
     
     private func font(in size: CGSize) -> Font{
         Font.system(size: min(size.width, size.height) * DrawingConstants.fontScale)
     }
     private struct DrawingConstants {
-        static let cornerRadius: CGFloat = 20
-        static let lineWidth: CGFloat = 3
         static let fontScale: CGFloat = 0.8
+        static let fontSize: CGFloat = 32
     }
 }
 

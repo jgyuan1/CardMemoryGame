@@ -13,8 +13,8 @@ import SwiftUI
 // add the following extention, you will simplify the usage
 
 extension View {
-    func cardify(isFaceUp: Bool, isHide: Bool) -> some View {
-        return self.modifier(Cardify(isFaceUp: isFaceUp, isHide: isHide ))
+    func cardify(isFaceUp: Bool, isMatched: Bool) -> some View {
+        return self.modifier(Cardify(isFaceUp: isFaceUp, isMatched: isMatched ))
     }
 }
 
@@ -24,19 +24,46 @@ extension View {
 //    return some View that almost certainly contains the View content
 //}
 //}
-struct Cardify: ViewModifier {
+struct Cardify: AnimatableModifier {
     var isFaceUp: Bool
-    var isHide: Bool
+    var isMatched: Bool
+    
+    var rotation: Double// in degrees
+    
+    var animatableData: Double {
+        get { rotation }
+        set { rotation = newValue }
+    }
+    
+    init(isFaceUp: Bool, isMatched: Bool) {
+        rotation = isFaceUp ? 0 : 180
+        self.isFaceUp = isFaceUp
+        self.isMatched = isMatched
+    }
+    
+    private struct DrawingConstants {
+        static let cornerRadius: CGFloat = 10
+        static let lineWidth: CGFloat = 3
+    }
     
     func body(content: Content) -> some View {
         ZStack {
-            if isFaceUp {
-                RoundedRectangle(cornerRadius: 10).fill(Color.white)
-                RoundedRectangle(cornerRadius: 10).stroke()
-                content
+            if rotation < 90 {
+                RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius).fill(Color.white)
+                RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius).strokeBorder(lineWidth: DrawingConstants.lineWidth, antialiased: true)
             } else {
                 RoundedRectangle(cornerRadius: 10)
             }
-        }.opacity(isHide ? 0 : 1)
+            content.opacity(rotation < 90 ? 1 : 0)
+                .rotationEffect(Angle.degrees(isMatched ? 360 : 0))
+        }
+        .opacity(isMatched ? 0 : 1)
+        .rotation3DEffect(.degrees(rotation), axis: (x: 0.0, y: 1.0, z: 0.0))
+        // want isFaceUp from false to true
+       
+//        .animation(.linear(duration: 3), value: isHide)
+
+        
     }
 }
+
