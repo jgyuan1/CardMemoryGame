@@ -13,37 +13,45 @@ struct EmojiMemoryGameView: View {
     // Array<String> or [String]
     
     @ObservedObject var game: EmojiMemoryGame
+    @State var dealt: [Int] = []
+    
+
+    
+    func isUndealt(_ card:EmojiMemoryGame.Card) -> Bool {
+        for index in dealt {
+            if card.id == index {
+                return false
+            }
+        }
+        return true
+    }
+    
+    func dealAllCards() {
+        for card in game.cards {
+            dealt.append(card.id)
+        }
+    }
     // computed property will not be initialized before "self"
     // var cards:Array<MemoryGame<String>.Card> { return viewModel.cards}
    
     var body: some View {
         VStack {
             gameBody
-            shuffle
-            
-        }
+            deckBody
+            HStack {
+                shuffle
+                Spacer()
+                restart
+            }
 
-            .padding(.horizontal)
-        
-//        ScrollView{
-//            LazyVGrid(columns: [GridItem(.adaptive(minimum:100))]) {
-//                ForEach(game.cards, content: {card in
-//                    CardView(card)
-//                        .aspectRatio(2/3, contentMode: .fit)
-//                    //onTapGesture uses viewModel, which cannot be used in CardView
-//                    //Users/chenglonghao/Development/swiftLearn/MemorizeCards/MemorizeCards/ContentView.swift:48:13: Instance member 'viewModel' of type 'ContentView' cannot be used on instance of nested type 'ContentView.CardView'
-//                        .onTapGesture {
-//                            game.chooseCard(card)
-//                        }
-//                })
-//            }
-//        }
-        
+        }
+        .padding(.horizontal)
     }
+    
     var gameBody: some View {
         AspectVGrid(items: game.cards, aspectRatio:2/3, content: { card in
             //Color.clear can
-            if card.isMatched && !card.isFaceUp {
+            if isUndealt(card) || (card.isMatched && !card.isFaceUp) {
                 Color.clear
             } else {
                 CardView(card)
@@ -57,12 +65,34 @@ struct EmojiMemoryGameView: View {
         })
             .foregroundColor(.red)
     }
+    
     var shuffle: some View {
         Button("shuffle") {
             withAnimation {
                 game.shuffle()
             }
         }
+    }
+    var restart: some View {
+        Button("restart") {
+            withAnimation {
+                game.restart()
+                dealt = []
+            }
+        }
+    }
+    
+    var deckBody: some View {
+        ZStack {
+            // ForEach() items should be identifiable and have ids
+            ForEach(game.cards.filter(isUndealt)) { card in
+                CardView(card)
+            }
+        }.onTapGesture {
+            dealAllCards()
+        }
+        .frame(width: 60, height: 90)
+        .foregroundColor(.red)
     }
 }
 
@@ -82,36 +112,12 @@ struct CardView: View {
                 Pie(startAngle: Angle(degrees: 0-90), endAngle: Angle(degrees: 110-90 ))
                                         .padding(5).opacity(0.5)
                 Text(card.content)
-//                    .modifier(RotationAnimationModifier(isMatched: card.isMatched))
-//                    .font(font(in: geometry.size))
                     .rotationEffect(Angle.degrees(card.isMatched ? 360 : 0))
                     .animation(.linear(duration: 1).repeatForever(autoreverses: false), value: card.isMatched)
                     .font(Font.system(size: DrawingConstants.fontSize))
                     .scaleEffect(scale(thatFits: geometry.size))
             }
             .cardify(isFaceUp: card.isFaceUp, isMatched: card.isMatched)
-//            .animation(.easeInOut(duration: 1), value: card.isMatched)
-            
-            
-//            .animation(Animation.easeInOut(duration: 5),value: card.isMatched)
-            
-//            ZStack {
-//                let shape = RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
-//                if card.isFaceUp {
-//                    //this line will return some view
-//                    shape.fill().foregroundColor(.white)
-//                    // need to call strokeBorder on shape
-//                    shape.strokeBorder(lineWidth: DrawingConstants.lineWidth)
-//                    Pie(startAngle: Angle(degrees: 0-90), endAngle: Angle(degrees: 110-90 ))
-//                        .padding(5).opacity(0.5)
-//                    Text(card.content)
-//                        .font(font(in: geometry.size))
-//                } else if card.isMatched {
-//                    shape.opacity(0)
-//                } else {
-//                    shape.fill()
-//                }
-//            }
         }
     }
     
@@ -127,10 +133,6 @@ struct CardView: View {
         static let fontSize: CGFloat = 32
     }
 }
-
-
-
-
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

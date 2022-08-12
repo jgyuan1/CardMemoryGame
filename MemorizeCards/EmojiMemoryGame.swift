@@ -32,4 +32,8 @@ class EmojiMemoryGame: ObservableObject{
         model.shuffle()
     }
     
+    func restart() {
+        model = MemoryGame<String> (numberOfPairsOfCards: 5) {index in EmojiMemoryGame.emojis[index]}
+    }
+    
 }
